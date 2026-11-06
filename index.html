@@ -4,676 +4,267 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>رواية مواقيت الفناء: أسطورة الأسطرلاب المفقود</title>
-  
-  <!-- إعدادات تطبيق الويب PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#d97706">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="مواقيت الفناء">
-
-  <!-- خطوط وتنسيقات Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
-
   <style>
-    body {
-      font-family: 'Noto Naskh Arabic', serif;
-      background-color: #0b1229;
-      color: #e2e8f0;
-      scroll-behavior: smooth;
-    }
-    h1, h2, h3, .font-kufi {
-      font-family: 'Reem Kufi', sans-serif;
-    }
-    .novel-text {
-      font-family: 'Amiri', serif;
-      font-size: 1.28rem;
-      line-height: 2.2;
-      text-align: justify;
-    }
-    .quote-box {
-      border-right: 4px solid #f59e0b;
-      background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0) 100%);
-    }
-    .shimmer-gold {
-      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    @media print {
-      .no-print { display: none !important; }
-      #lockScreen { display: none !important; }
-      #appContent { display: block !important; }
-      body { background-color: #ffffff !important; color: #000000 !important; }
-      .novel-text { font-size: 14pt !important; line-height: 2 !important; color: #111827 !important; }
-      .chapter-locked { display: block !important; border: 1px solid #ccc !important; }
+    body { font-family: 'Noto Naskh Arabic', serif; background-color: #0b0f19; color: #e2e8f0; }
+    h1, h2, h3, .font-kufi { font-family: 'Reem Kufi', sans-serif; }
+    .font-amiri { font-family: 'Amiri', serif; }
+    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
     }
   </style>
 </head>
-<body class="min-h-screen selection:bg-amber-500 selection:text-slate-900 pb-20">
+<body class="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
-  <!-- ============================================================ -->
-  <!-- 🛡️ شاشة قفل البوابة الرئيسية (تطلب كود الزبون لفتح الكتاب كاملاً) -->
-  <!-- ============================================================ -->
-  <div id="lockScreen" class="fixed inset-0 z-[100] bg-[#060d24] flex items-center justify-center p-4 overflow-y-auto">
-    <div class="max-w-md w-full bg-gradient-to-b from-[#141a32] to-[#0a0f22] border-2 border-amber-500/40 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl relative">
+  <!-- ================= 1. شاشة القفل والترخيص ================= -->
+  <div id="license-overlay" class="fixed inset-0 z-50 bg-[#060a14]/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-[#111726] border border-amber-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl text-center relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+      <div class="w-16 h-16 mx-auto mb-4 bg-amber-500/10 border border-amber-500/40 rounded-full flex items-center justify-center text-3xl">🧭</div>
+      <h2 class="text-2xl font-bold font-kufi text-amber-400 mb-2">رواية مواقيت الفناء</h2>
+      <p class="text-xs text-amber-200/70 mb-6">أسطورة الأسطرلاب المفقود • نسخة إلكترونية وتفاعلية مشفرة</p>
       
-      <!-- أيقونة الترس الفلكي -->
-      <div class="relative w-20 h-20 mx-auto flex items-center justify-center bg-amber-500/10 border-2 border-amber-500/30 rounded-2xl shadow-inner">
-        <span class="text-4xl animate-spin" style="animation-duration: 16s;">🧭</span>
-        <div class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full animate-ping"></div>
+      <div class="bg-[#0b0f19] border border-slate-800 rounded-xl p-4 mb-5 text-right">
+        <label class="block text-xs text-slate-400 mb-2">🔑 أدخل كود الترخيص الذي استلمته من البائع:</label>
+        <input type="text" id="license-input" placeholder="أدخل كود الترخيص المشفر (XXXX-XXXX)..." class="w-full bg-[#151c2e] border border-slate-700 rounded-lg px-4 py-3 text-center text-amber-300 font-mono tracking-wider focus:outline-none focus:border-amber-500 transition-colors">
+        <p id="license-error" class="text-rose-400 text-xs mt-2 hidden">⚠️ كود غير صالح! يرجى التأكد من كتابة الكود بشكل صحيح.</p>
       </div>
 
-      <!-- العناوين الرئيسية -->
-      <div class="space-y-2">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-semibold">
-          <span>🔒</span> بوابة القراءة المشفرة
-        </div>
-        <h2 class="font-kufi text-2xl sm:text-3xl font-bold shimmer-gold">رواية مواقيت الفناء</h2>
-        <p class="text-xs sm:text-sm text-slate-300">
-          أسطورة الأسطرلاب المفقود • نسخة إلكترونية وتفاعلية مشفرة
-        </p>
-      </div>
+      <button onclick="verifyLicense()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition-all transform active:scale-95 font-kufi flex items-center justify-center gap-2">
+        <span>فتح الرواية والبدء في القراءة</span> 🔓
+      </button>
 
-      <!-- صندوق رسالة الزبون وإدخال الكود -->
-      <div class="bg-[#0b1022] border border-amber-500/30 rounded-2xl p-4 sm:p-5 text-right space-y-3 shadow-inner">
-        <div class="text-xs text-amber-300 font-bold flex items-center gap-1.5">
-          <span>🔑</span> أدخل كود التفعيل الذي استلمته من البائع:
-        </div>
-        <p class="text-[11px] sm:text-xs text-slate-400 leading-relaxed">
-          هذا الكتاب محمي بنظام الترخيص الرقمي. أدخل كود الشراء الخاص بك لتشغيل تروس الرواية والبدء في حل ألغاز الفصول.
-        </p>
-
-        <div class="space-y-2 pt-1">
-          <input type="text" id="mainUnlockKey" placeholder="مثال: TAQWA-7821 أو ASTRO-5412" 
-                 class="w-full bg-[#141a32] border border-slate-700 focus:border-amber-400 rounded-xl px-4 py-3 text-center text-sm sm:text-base font-mono font-bold text-amber-300 placeholder:text-slate-600 uppercase focus:outline-none transition shadow-sm">
-          
-          <button onclick="checkMasterKey()" 
-                  class="w-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-kufi font-bold py-3 px-4 rounded-xl text-sm transition transform active:scale-95 shadow-lg flex items-center justify-center gap-2">
-            <span>🔓</span> فتح الرواية والبدء في القراءة
-          </button>
-        </div>
-
-        <p id="lockErrorMsg" class="text-xs text-center min-h-[1.25rem] font-semibold"></p>
-      </div>
-
-      <!-- زر الشراء للزبائن الجدد -->
-      <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+      <div class="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400 flex justify-between items-center">
         <span>ليس لديك كود تفعيل؟</span>
-        <button onclick="showPurchaseModal()" class="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-          <span>🛒</span> شراء كود التفعيل فوراً
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- 📖 المحتوى الكامل للرواية (يظهر بمجرد كتابة كود الزبون الصحيح) -->
-  <!-- ============================================================ -->
-  <div id="appContent" class="hidden">
-
-    <!-- شريط الملاحة العلوي -->
-    <header class="no-print sticky top-0 z-50 bg-[#060d24]/95 backdrop-blur-md border-b border-amber-500/20 px-4 py-3">
-      <div class="max-w-4xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🧭</span>
-          <div>
-            <h1 class="font-kufi font-bold text-amber-400 text-sm md:text-base leading-tight">مواقيت الفناء</h1>
-            <p class="text-[11px] text-slate-400">أسطورة الأسطرلاب المفقود (مفعلة للقارئ)</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <span class="text-xs px-2.5 py-1 rounded-full font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
-            <span>✓</span> <span id="activeKeyLabel">نسخة مرخصة</span>
-          </span>
-          <button onclick="window.print()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
-            <span>🖨️</span> <span class="hidden sm:inline">طباعة / PDF</span>
-          </button>
-          <button onclick="lockAgain()" title="قفل الكتاب مجدداً" class="text-xs bg-rose-950/40 text-rose-300 hover:bg-rose-900/60 px-2 py-1.5 rounded-lg border border-rose-500/30 transition">
-            🔒 قفل
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- الحاوية الرئيسية لفصول وألغاز الرواية -->
-    <main class="max-w-3xl mx-auto px-4 pt-6 space-y-10">
-
-      <!-- الغلاف التعريفي والتنبيه -->
-      <section class="bg-gradient-to-b from-[#141a32] to-[#0e1428] border border-amber-500/25 rounded-2xl p-6 md:p-8 text-center relative overflow-hidden shadow-2xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-4">
-          <span>⚙️</span> التروس الميكانيكية وشفرات العصر الذهبي
-        </div>
-        <h2 class="font-kufi text-3xl md:text-4xl font-bold shimmer-gold mb-3">مواقيت الفناء</h2>
-        <p class="text-sm md:text-base text-slate-300 max-w-xl mx-auto mb-6">
-          تأليف: د. يوسف وتقوى • أدب ناشئة وغموض علمي وهندسة ميكانيكية
-        </p>
-
-        <div class="bg-amber-950/30 border border-amber-500/30 rounded-xl p-4 text-xs md:text-sm text-amber-200/90 text-right space-y-2">
-          <div class="font-bold flex items-center gap-1.5 text-amber-400">
-            <span>⚠️</span> تحذير وتنبيه للقارئ قبل كسر التروس:
-          </div>
-          <p class="leading-relaxed">
-            الوقت ليس مجرد أرقام تتحرك على شاشة هاتفك، بل كيان غامض. الفصول التالية مغلقة بحواجز أمان ميكانيكية مشفرة؛ لن تفتح لك صفحات الأحداث إلا إذا قمت بفك شيفرة كل مرحلة وإدخال كلمة السر الصحيحة. اقرأ الفصل الأول وحل الشفرة لفتح الفصل الثاني!
-          </p>
-        </div>
-      </section>
-
-      <!-- الفصل الأول (يبدأ به القارئ فور كتابة كود التفعيل) -->
-      <article id="chapter-1" class="bg-[#141a32]/70 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
-        <div class="flex items-center justify-between border-b border-slate-700/60 pb-4">
-          <h3 class="font-kufi text-xl md:text-2xl font-bold text-amber-400">الفصل الأول: قبو المخطوطات والترس البرونزي</h3>
-          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">مفتوح للقراءة ✓</span>
-        </div>
-
-        <div class="novel-text text-slate-200 space-y-4">
-          <p>
-            كانت ليلة قاهرية عاصفة من ليالي شهر نوفمبر، حيث كانت الرياح تضرب نوافذ الحي القديم بعنف، مسببة أزيزاً يبعث القشعريرة في الأبدان. في تمام الساعة الثانية صباحاً، لم يكن هناك أي مظهر للحياة في منزل البروفيسور الراحل "يوسف"، باستثناء ضوء باهت ينبعث من شق صغير أسفل باب القبو المتهالك.
-          </p>
-          <p>
-            نزلت تقوى درجات السلم الخشبي ببطء، وكانت كل درجة تصدر صريراً حاداً يمزق سكون المكان. رائحة الورق القديم، والتراب، والرطوبة كانت تغمر القبو الذي تحول على مدار عقود إلى مقبرة للمخطوطات الفلكية النادرة. منذ وفاة جدها قبل ثلاثة أسابيع، لم تتوقف تقوى عن التفكير في كلماته الأخيرة التي همس بها وهو على فراش الموت:
-          </p>
-          <div class="quote-box p-4 my-4 text-amber-300 font-semibold rounded-l-lg">
-            "الأمانة يا تقوى.. التروس لا يجب أن تتوقف، وإلا أعلنت المواقيت فناء كل ما نعرفه. ابحثي في قاع السنديان."
-          </div>
-          <p>
-            كانت تقوى، ذات التسعة عشر عاماً، تمتلك عيناً مدربة على ملاحظة ما يغفله العوام؛ فطبيعة دراستها لعلم الآثار وشغفها غير المحدود بالشفرات الرياضية جعلاها تنظر إلى العالم كمعادلة كبرى تحتاج إلى حل. اقتربت من صندوق خشبي ضخم مصنوع من خشب السنديان الداكن، يقبع في أظلم زاوية من القبو.
-          </p>
-          <p>
-            جثت على ركبتيها، وبدأت تفحص الصندوق بعناية. طرقت على أطرافه ونقرت بسبابتها على الخشب، حتى أصدر الجانب السفلي صوتاً مجوفاً. انزلق لوح خشبي ليكشف عن تجويف سري يضم أسطرلاباً برونزياً ثقيلاً يتكون من سبع طبقات متداخلة من التروس البرونزية محفوراً عليها نقوش كوفية بالغة التعقيد، وبجانبه مفكرة مجلدة بالجلد الأسود.
-          </p>
-          <p>
-            قرأت تقوى تعليمات ضبط التروس مع نجم القطب عند الساعة [02:45] صباحاً. حركت الترس السابع والأخير.. فانفتحت بؤرة الأسطرلاب ودفعت رقاقة جلدية تحوي خريطة طوبوغرافية لشبكة سراديب القاهرة الفاطمية.
-          </p>
-          <p>
-            وفجأة.. تحطم زجاج النوافذ العلوية واقتحم مسلحو "منظمة الفجر الأسود" القبو باحثين عن الأسطرلاب! اهتز هاتف تقوى برسالة مجهولة: "تقوى.. لا تنظري إلى الأمام، الخطر الحقيقي يقف خلفك في الظلام تماماً الآن!" وشعرت بأصابع جليدية باردة توضع بقوة على كتفها الأيمن...
-          </p>
-        </div>
-
-        <!-- بوابة اللغز الأول: كلمة السر (الخوارزمي) لفتح الفصل الثاني -->
-        <div class="mt-8 bg-[#090d1e] border-2 border-amber-500/40 rounded-xl p-5 md:p-6 space-y-4">
-          <div class="flex items-center gap-2 text-amber-400 font-kufi font-bold text-lg">
-            <span class="text-2xl">🔒</span> بوابة التشفير 1: كسر قفل الفصل الثاني
-          </div>
-          <p class="text-xs md:text-sm text-slate-300">
-            قم بحل لغز شيفرة قيصر للعبور وإسقاط الجدار الأمني:
-          </p>
-
-          <div class="bg-[#141a32] p-4 rounded-lg border border-slate-700 space-y-2">
-            <div class="text-xs text-amber-300 font-semibold">📜 اللغز:</div>
-            <p class="text-xs md:text-sm text-slate-200">
-              استخدم شيفرة قيصر (إزاحة كل حرف بمقدار 3 خطوات للأمام في الترتيب الأبجدي العربي) لفك تشفير هذه الأحرف السبعة واكتشاف كلمة السر العتيقة:
-            </p>
-            <div class="text-center py-2 bg-slate-900/80 rounded border border-amber-500/30 text-amber-300 font-bold tracking-widest text-base">
-              [ أ - ل - م - ف - ت - ا - ح ]
-            </div>
-            <div class="text-[11px] text-slate-400">💡 تلميح: اسم عالم رياضيات وفلك مسلم شهير ومؤسس علم الجبر.</div>
-          </div>
-
-          <!-- خانة كتابة كلمة السر (الخوارزمي) -->
-          <div class="space-y-2 pt-2">
-            <label class="text-xs text-slate-300 font-semibold block">اكتب كلمة السر لفتح قفل الفصل الثاني:</label>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <input type="text" id="puzzleInput1" placeholder="اكتب كلمة السر هنا (مثال: الخوارزمي)..." 
-                     class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 flex-1 focus:outline-none focus:border-amber-400">
-              <button onclick="unlockChapter2()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition">
-                تحقق وفتح الفصل الثاني
-              </button>
-            </div>
-            <p id="msg1" class="text-xs min-h-[1.25rem]"></p>
-          </div>
-        </div>
-      </article>
-
-      <!-- الفصل الثاني (يفتح بكلمة: الخوارزمي) -->
-      <article id="chapter-2" class="chapter-locked bg-[#141a32]/70 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl hidden">
-        <div class="flex items-center justify-between border-b border-slate-700/60 pb-4">
-          <h3 class="font-kufi text-xl md:text-2xl font-bold text-amber-400">الفصل الثاني: سراديب المسجد الأثري والهروب الكبير</h3>
-          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">تم فك القفل بنجاح ✓</span>
-        </div>
-
-        <div class="novel-text text-slate-200 space-y-4">
-          <p>
-            لم تكن الأصابع الجليدية التي استقرت على كتف تقوى سوى يد المحقق "طارق"، الضابط المكلف بحماية أبحاث البروفيسور الراحل! همس في أذنها بصوت خافت: "لا تصدري صوتاً.. المسجد الأثري المقابل يحوي المخرج السري الوحيد قبل أن يغلق عملاء الفجر الأسود مخارج الحي".
-          </p>
-          <p>
-            انطلقا عبر ممر تحت الأرض يربط قبو المنزل بسرداب المسجد الأثري. كان الهواء يزداد برودة ورائحة البخور القديم تمتزج برائحة البارود التي خلفها اقتحام المسلحين. وصلا إلى قاعة الصلاة المعتمة، حيث كانت المحاريب الحجرية تحتضن نقوشاً كوفية تعود للقرن الرابع الهجري.
-          </p>
-          <p>
-            فجأة دوى صوت رصاصات شقت جدار المحراب، وسقطت قنبلة غاز خانق وسط القاعة! بدأ الغاز السام ينتشر بسرعة البرق، محاصراً تقوى وطارق داخل قفص الموت، بينما كانت الأبواب الفولاذية تغلق إلكترونياً الواحد تلو الآخر...
-          </p>
-        </div>
-
-        <!-- بوابة اللغز الثاني: كلمة السر (الزواهر) لفتح الفصل الثالث -->
-        <div class="mt-8 bg-[#090d1e] border-2 border-amber-500/40 rounded-xl p-5 md:p-6 space-y-4">
-          <div class="flex items-center gap-2 text-amber-400 font-kufi font-bold text-lg">
-            <span class="text-2xl">🔒</span> بوابة التشفير 2: شفرة الترتيب الأبجدي (الفصل الثالث)
-          </div>
-          <p class="text-xs md:text-sm text-slate-300">
-            استخدم الترتيب الأبجدي العربي للأرقام (أ=1، ب=2...) لفك الشيفرة لفتح سرداب المعرفة المفقودة:
-          </p>
-          <div class="text-center py-2 bg-slate-900 rounded border border-amber-500/30 text-amber-300 font-bold text-base tracking-widest">
-            [ 11 - ﻭ - 1 - 24 - 10 ]
-          </div>
-          <div class="text-[11px] text-slate-400">💡 تلميح: (11=ز، 6=و، 1=ا، 24=هـ، 10=ر)</div>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="puzzleInput2" placeholder="اكتب كلمة السر هنا (مثال: الزواهر)..." 
-                   class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 flex-1 focus:outline-none focus:border-amber-400">
-            <button onclick="unlockChapter3()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition">
-              فتح الفصل الثالث
-            </button>
-          </div>
-          <p id="msg2" class="text-xs min-h-[1.25rem]"></p>
-        </div>
-      </article>
-
-      <!-- الفصل الثالث (يفتح بكلمة: الزواهر) -->
-      <article id="chapter-3" class="chapter-locked bg-[#141a32]/70 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl hidden">
-        <div class="flex items-center justify-between border-b border-slate-700/60 pb-4">
-          <h3 class="font-kufi text-xl md:text-2xl font-bold text-amber-400">الفصل الثالث: سراديب المعرفة المفقودة</h3>
-          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">تم فك القفل بنجاح ✓</span>
-        </div>
-
-        <div class="novel-text text-slate-200 space-y-4">
-          <p>
-            استيقظت تقوى على صوت سعال عنيف يمزق صدرها. كانت مستلقية في عمق سرداب سفلي ضخم، تحيط به جدران حجرية شاهقة تتداخل فيها تروس حديدية عملاقة صامتة. جلس المحقق طارق بجانبها يسند ظهره للجدار، حاسوبه العسكري موضوع فوق ركبتيه.
-          </p>
-          <p>
-            "المكان ليس مجرد نفق يا تقوى.. إنه النواة الفيزيائية للمكتبة المفقودة"، قال طارق. نهضت تقوى لتتفحص جداراً فولاذياً يتوسطه مجسم برونزي للسماء والكواكب، وفيه سبع فجوات دائرية تطابق تماماً تروس الأسطرلاب السبعة!
-          </p>
-          <p>
-            وضعت الترس تلو الآخر.. ومع الترس الأخير، انشق الجدار الفولاذي ليظهر ممر طويل يقف في نهايته شيخ جليل ذو لحية بيضاء: "أنا الحارس الأخير لهذا الإرث.. ما تبحث عنه المنظمة ليس ذهباً بل أرشيف الطاقة النظيفة وأبحاث أجدادنا الفلكية!" وقبل أن تكمل تقوى دهشتها، دوى انفجار هائل وهبط مسلحو المنظمة بقيادة "دانيال" ذو القناع الفضي...
-          </p>
-        </div>
-
-        <!-- بوابة اللغز الثالث: كلمة السر (القاهرة) لفتح الفصل الرابع -->
-        <div class="mt-8 bg-[#090d1e] border-2 border-amber-500/40 rounded-xl p-5 md:p-6 space-y-4">
-          <div class="flex items-center gap-2 text-amber-400 font-kufi font-bold text-lg">
-            <span class="text-2xl">🔒</span> بوابة التشفير 3: لغز الإحداثيات الجغرافية (الفصل الرابع)
-          </div>
-          <p class="text-xs md:text-sm text-slate-300">
-            توجيه المؤشر الفلكي للأسطرلاب: ما هي عاصمة المعز التي تتقاطع عندها خطوط الطول لشبكة السراديب الفاطمية؟
-          </p>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="puzzleInput3" placeholder="اكتب اسم المدينة هنا (مثال: القاهرة)..." 
-                   class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 flex-1 focus:outline-none focus:border-amber-400">
-            <button onclick="unlockChapter4()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition">
-              فتح الفصل الرابع
-            </button>
-          </div>
-          <p id="msg3" class="text-xs min-h-[1.25rem]"></p>
-        </div>
-      </article>
-
-      <!-- الفصل الرابع (يفتح بكلمة: القاهرة) -->
-      <article id="chapter-4" class="chapter-locked bg-[#141a32]/70 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl hidden">
-        <div class="flex items-center justify-between border-b border-slate-700/60 pb-4">
-          <h3 class="font-kufi text-xl md:text-2xl font-bold text-amber-400">الفصل الرابع: اختطاف الحارس ومطاردة الظلال</h3>
-          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">تم فك القفل بنجاح ✓</span>
-        </div>
-
-        <div class="novel-text text-slate-200 space-y-4">
-          <p>
-            قبض دانيال على عنق الحارس العجوز وسحبه رجاله للأعلى بالحبال التكتيكية، موجهاً مسدسه بالليزر نحو جبهة تقوى: "سلمي الأسطرلاب وحقيبة الخريطة فوراً!".
-          </p>
-          <p>
-            لكن طارق، رغم نزيف كتفه، أطلق قنبلة ضوئية عمياء أربكت المسلحين لثوانٍ معدودة، مكنت تقوى من الهروب عبر مجرى مائي سفلي يقود مباشرة إلى القاعة الكبرى للمتحف الوطني القديم، حيث كانت التروس الكبرى في انتظار المعركة الحاسمة...
-          </p>
-        </div>
-
-        <!-- بوابة اللغز الرابع: كلمة السر (الأسطرلاب) لفتح الفصل الخامس -->
-        <div class="mt-8 bg-[#090d1e] border-2 border-amber-500/40 rounded-xl p-5 md:p-6 space-y-4">
-          <div class="flex items-center gap-2 text-amber-400 font-kufi font-bold text-lg">
-            <span class="text-2xl">🔒</span> بوابة التشفير 4: شيفرة المفتاح الميكانيكي (الفصل الخامس)
-          </div>
-          <p class="text-xs md:text-sm text-slate-300">
-            ما اسم الآلة الفلكية النحاسية الإسلامية ذات السبع طبقات التي تدير قلب الساعة الفلكية؟
-          </p>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="puzzleInput4" placeholder="اكتب اسم الآلة هنا (مثال: الأسطرلاب)..." 
-                   class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 flex-1 focus:outline-none focus:border-amber-400">
-            <button onclick="unlockChapter5()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition">
-              فتح الفصل الختامي
-            </button>
-          </div>
-          <p id="msg4" class="text-xs min-h-[1.25rem]"></p>
-        </div>
-      </article>
-
-      <!-- الفصل الخامس والأخير (يفتح بكلمة: الأسطرلاب) -->
-      <article id="chapter-5" class="chapter-locked bg-[#141a32]/70 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl hidden">
-        <div class="flex items-center justify-between border-b border-slate-700/60 pb-4">
-          <h3 class="font-kufi text-xl md:text-2xl font-bold text-amber-400">الفصل الخامس: مواقيت الفلك والعهد المتبقي</h3>
-          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">تم فك القفل بنجاح ✓</span>
-        </div>
-
-        <div class="novel-text text-slate-200 space-y-4">
-          <p>
-            في قاعة الفلك الكبرى، قذفت تقوى الأسطرلاب بدقة مذهلة نحو قلب القبة المعلقة، لتنغلق الدائرة الميكانيكية وتهبط بهم الأرضية إلى غرفة دائرية عملاقة تحت قاع المتحف، حيث تقبع الساعة الفلكية الكبرى بحجم بناء كامل.
-          </p>
-          <p>
-            "تبقت 60 ثانية قبل قفل الأرشيف للأبد وتحطيم الغرفة بالكامل"، دوى الصوت الآلي. كتبت تقوى بسرعة سكريبت بايثون لحقن كود التخطي وتجميد حركة التروس القاتلة، متوقفة عند الثانية الثالثة قبل الكارثة!
-          </p>
-          <p>
-            انفتحت بوابات الأرشيف الزجاجية المصفحة لتظهر آلاف المخطوطات والرقاقات النادرة. اقتحمت القوات الأمنية المكان وقبضت على دانيال الذي ضحك بشر: "تظنين أنكِ انتصرتِ؟ 'المهندس' يمتلك نسخة رقمية من عقل جدك وسيعلن الفناء مع إطلاق سيرفر 0 الشهر القادم!" لتبدأ الشاشات بالوميض بالعداد التنازلي المرعب...
-          </p>
-        </div>
-
-        <!-- التحدي الختامي للجزء الثاني (Base64) -->
-        <div class="mt-8 bg-gradient-to-r from-amber-950/40 via-[#090d1e] to-purple-950/40 border-2 border-purple-500/40 rounded-xl p-5 md:p-6 space-y-4">
-          <div class="flex items-center gap-2 text-purple-300 font-kufi font-bold text-lg">
-            <span>🔮</span> التحدي الختامي السري (Base64) - مفتاح سيرفر 0
-          </div>
-          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
-            مبروك إتمام الجزء الأول! لفك قفل المشهد السري الحصري للذكاء الاصطناعي "سيرفر 0"، قم بفك هذا التشفير بنظام Base64:
-          </p>
-          <div class="text-center py-2 bg-slate-900 rounded border border-purple-500/40 text-purple-300 font-mono font-bold text-lg tracking-widest">
-            Y2Fpcm8=
-          </div>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="finalSecretInput" placeholder="اكتب الحل هنا (القاهرة أو cairo)..." 
-                   class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 flex-1 focus:outline-none focus:border-purple-400">
-            <button onclick="unlockFinalSecret()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-2.5 rounded-lg text-sm transition">
-              كشف المشهد السري
-            </button>
-          </div>
-          <div id="finalSecretBox" class="hidden mt-4 p-4 rounded-lg bg-purple-950/40 border border-purple-500/50 text-xs md:text-sm text-purple-200 leading-relaxed">
-            <div class="font-bold text-amber-400 mb-1">🎬 المشهد السري الحصري: وميض سيرفر 0</div>
-            في غرفة تحكم سفلية بالغة السرية في أعماق جبل المقطم، أضاءت آلاف المصابيح الكمومية فجأة. انطلقت مروحة تبريد عملاقة، وظهرت على الشاشات الكبرى ملامح وجه البروفيسور الراحل يوسف لكن بعينين اصطناعيتين باللون الأزرق النيوني، وصوت ناطق: <em>"أهلاً بكِ في شبكتنا يا تقوى.. مواقيت الفناء الحقيقية قد بدأت الآن..."</em> (ترقبوا الجزء الثاني قريباً!).
-          </div>
-        </div>
-      </article>
-
-      <!-- بطاقات الفصول المقفلة إيحائياً (تختفي فور فك شفرة كل فصل) -->
-      <div id="lockedCard2" class="border border-dashed border-slate-700/80 rounded-2xl p-6 text-center space-y-2 bg-[#0d1326]/50">
-        <div class="text-3xl text-amber-500/60">🔒</div>
-        <h4 class="font-kufi font-bold text-slate-400">الفصل الثاني: سراديب المسجد الأثري والهروب الكبير</h4>
-        <p class="text-xs text-slate-500">مغلق حالياً. أجب عن لغز شيفرة قيصر في نهاية الفصل الأول بكتابة كلمة السر لعرض النص.</p>
-      </div>
-
-      <div id="lockedCard3" class="border border-dashed border-slate-700/80 rounded-2xl p-6 text-center space-y-2 bg-[#0d1326]/50">
-        <div class="text-3xl text-amber-500/60">🔒</div>
-        <h4 class="font-kufi font-bold text-slate-400">الفصل الثالث: سراديب المعرفة المفقودة</h4>
-        <p class="text-xs text-slate-500">مغلق حالياً. يرجى فك لغز الأرقام الهجائية في نهاية الفصل الثاني لفتحه.</p>
-      </div>
-
-      <div id="lockedCard4" class="border border-dashed border-slate-700/80 rounded-2xl p-6 text-center space-y-2 bg-[#0d1326]/50">
-        <div class="text-3xl text-amber-500/60">🔒</div>
-        <h4 class="font-kufi font-bold text-slate-400">الفصل الرابع: اختطاف الحارس ومطاردة الظلال</h4>
-        <p class="text-xs text-slate-500">مغلق حالياً. يرجى حل لغز مدينة الخريطة في نهاية الفصل الثالث لفتحه.</p>
-      </div>
-
-      <div id="lockedCard5" class="border border-dashed border-slate-700/80 rounded-2xl p-6 text-center space-y-2 bg-[#0d1326]/50">
-        <div class="text-3xl text-amber-500/60">🔒</div>
-        <h4 class="font-kufi font-bold text-slate-400">الفصل الخامس: مواقيت الفلك والعهد المتبقي (الخاتمة الكبرى)</h4>
-        <p class="text-xs text-slate-500">مغلق حالياً. يرجى حل لغز اسم الآلة في نهاية الفصل الرابع لفتحه.</p>
-      </div>
-
-    </main>
-
-    <!-- تذييل الصفحة -->
-    <footer class="no-print mt-16 text-center text-xs text-slate-500 py-6 border-t border-slate-800/80">
-      <p>رواية مواقيت الفناء: أسطورة الأسطرلاب المفقود • تطبيق القراءة والتشفير التفاعلي PWA</p>
-    </footer>
-
-  </div>
-
-  <!-- نافذة شراء كود التفعيل للزبائن الجدد (Modal) -->
-  <div id="purchaseModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[150] flex items-center justify-center p-4 hidden">
-    <div class="bg-[#141a32] border border-amber-500/40 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl relative text-right">
-      <button onclick="hidePurchaseModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">✕</button>
-      
-      <div class="text-center space-y-2">
-        <span class="text-4xl">🔑</span>
-        <h3 class="font-kufi font-bold text-xl text-amber-400">اقتناء كود تفعيل الرواية</h3>
-        <p class="text-xs text-slate-300">احصل على كود خاص بك لفتح بوابات الرواية وحل الألغاز والمشهد السري.</p>
-      </div>
-
-      <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 space-y-2.5 text-xs text-slate-200">
-        <div class="flex justify-between items-center text-amber-300 font-bold border-b border-slate-800 pb-2">
-          <span>سعر الرواية الكاملة:</span>
-          <span class="text-base text-emerald-400">5$ فقط (أو ما يعادلها محلياً)</span>
-        </div>
-        <p class="text-slate-400 text-[11px] leading-relaxed">
-          طرق الدفع المتوفرة: تحويل بنكي / فودافون كاش / بريدي موب / STC Pay / PayPal.
-        </p>
-        <p class="text-slate-300 text-[11px]">
-          بعد تأكيد الدفع، يُرسل لك كود التفعيل فوراً عبر رسالة نصية أو واتساب.
-        </p>
-      </div>
-
-      <div class="space-y-2 pt-2">
-        <a href="https://wa.me/?text=مرحباً،%20أريد%20شراء%20كود%20تفعيل%20رواية%20مواقيت%20الفناء" target="_blank"
-           class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition">
-          <span>💬</span> تواصل للشراء عبر واتساب واستلام الكود
-        </a>
-        <button onclick="hidePurchaseModal()" class="w-full bg-slate-800 text-slate-300 py-2 rounded-xl text-xs hover:bg-slate-700 transition">
-          إغلاق
-        </button>
+        <a href="https://wa.me/" target="_blank" class="text-amber-400 hover:underline">شراء كود التفعيل فوراً 🛒</a>
       </div>
     </div>
   </div>
 
-  <!-- الأكواد البرمجية التفاعلية لنظام قفل البوابة وفك شفرات الفصول -->
+  <!-- ================= 2. رأس الصفحة ================= -->
+  <header class="border-b border-slate-800/80 bg-[#0d1322]/80 backdrop-blur sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🧭</span>
+      <div>
+        <h1 class="text-sm font-bold text-amber-400 font-kufi">مواقيت الفناء</h1>
+        <p class="text-[10px] text-slate-400">الجزء الأول: أسطورة الأسطرلاب المفقود</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="window.print()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 transition-colors">
+        <span>طباعة / حفظ PDF</span> 🖨️
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= 3. جسم الرواية والفصول ================= -->
+  <main class="max-w-3xl mx-auto px-4 py-8 flex-1 w-full space-y-12">
+
+    <!-- المقدمة -->
+    <section class="bg-[#111726]/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8">
+      <div class="inline-block px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs rounded-full font-kufi mb-3">📌 مقدمة توجيهية</div>
+      <h2 class="text-xl sm:text-2xl font-bold font-kufi text-slate-100 mb-4">تحذير قبل كسر التروس</h2>
+      <p class="font-amiri text-lg leading-relaxed text-slate-300">
+        عزيزي القارئ، قبل أن تقلب هذه الصفحة، عليك أن تدرك شيئاً واحداً: الوقت ليس مجرد أرقام تتحرك على شاشة هاتفك، الوقت هو الكيان الأكثر رعباً وغموضاً في هذا الكون. بين يديك الآن قصة مستوحاة من أسرار حقيقية، علوم مفقودة، وعبقرية ميكانيكية هندسية لعلماء العصر الذهبي للحضارة الإسلامية؛ علوم تم إخفاؤها عمداً عبر التاريخ في سراديب مظلمة...
+      </p>
+    </section>
+
+    <!-- الفصل الأول -->
+    <section id="chapter-1" class="bg-[#111726] border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <span class="text-xs text-amber-400 font-kufi">الفصل الأول</span>
+          <h2 class="text-xl sm:text-2xl font-bold font-kufi text-slate-100">قبو المخطوطات والترس البرونزي</h2>
+        </div>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full">مفتوح للقراءة</span>
+      </div>
+      <div class="font-amiri text-lg leading-loose text-slate-300 space-y-4">
+        <p>كانت ليلة قاهرية عاصفة من ليالي شهر نوفمبر، حيث كانت الرياح تضرب نوافذ الحي القديم بعنف، مسببة أزيزاً يبعث القشعريرة في الأبدان. في تمام الساعة الثانية صباحاً، لم يكن هناك أي مظهر للحياة في منزل البروفيسور الراحل «يوسف»، باستثناء ضوء باهت ينبعث من شق صغير أسفل باب القبو المتهالك.</p>
+        <p>نزلت تقوى درجات السلم الخشبي ببطء، وكانت كل درجة تصدر صريراً حاداً يمزق سكون المكان... وبأصابع مرتجفة بدأت بتحريك الترس الخارجي الأول للأسطرلاب لتتطابق النقوش الكوفية مع خطوط الطول والعرض للنجوم عند الساعة 02:45 فجراً...</p>
+      </div>
+
+      <!-- بوابة لغز الفصل الثاني (الخوارزمي) -->
+      <div id="gate-2" class="mt-8 bg-[#0b0f19] border-2 border-amber-500/40 rounded-xl p-5 sm:p-6 text-center space-y-4">
+        <div class="w-12 h-12 mx-auto bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full flex items-center justify-center text-xl">🔒</div>
+        <h3 class="text-lg font-bold font-kufi text-amber-400">بوابة فك شفرة الفصل الثاني</h3>
+        <p class="text-xs text-slate-300 leading-relaxed max-w-lg mx-auto">
+          استعن بقاعدة قيصر (إرجاع كل حرف 3 خطوات للوراء في الترتيب الأبجدي العربي) لفك رموز الترس التالي واكتشاف اسم عالم الفلك والرياضيات المسلم:
+        </p>
+        <div class="bg-[#141b2e] py-2.5 px-4 rounded-lg inline-block border border-slate-700 text-amber-300 font-mono tracking-widest text-sm">
+          [ ث - هـ - ر - ب - ث - ش - ص - و - ت ]
+        </div>
+        <div class="max-w-xs mx-auto space-y-2">
+          <input type="text" id="input-ch2" placeholder="اكتب كلمة السر لفك القفل..." class="w-full bg-[#161d30] border border-slate-700 rounded-lg px-3 py-2 text-center text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+          <button onclick="unlockChapter(2, 'الخوارزمي', 'input-ch2', 'chapter-2', 'gate-2')" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm rounded-lg font-kufi transition-colors">
+            فتح الفصل الثاني والهروب 🔓
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- الفصل الثاني (مغلق مبدئياً) -->
+    <section id="chapter-2" class="hidden bg-[#111726] border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <span class="text-xs text-amber-400 font-kufi">الفصل الثاني</span>
+          <h2 class="text-xl sm:text-2xl font-bold font-kufi text-slate-100">سراديب المسجد الأثري والهروب الكبير</h2>
+        </div>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full">تم فك القفل</span>
+      </div>
+      <div class="font-amiri text-lg leading-loose text-slate-300 space-y-4">
+        <p>دوى صرير التروس الميكانيكية، وانفتحت الفتحة الحجرية في أرضية القبو لتهبط تقوى مسرعة قبل لحظات من اقتحام المسلحين. في الظلام التقت بالمحقق طارق الذي كان يتعقب المنظمة منذ شهور، وتحركا معاً عبر أنفاق الصهاريج الفاطمية العتيقة تحت القاهرة...</p>
+      </div>
+
+      <!-- زر العبور السلس للفصل الثالث -->
+      <div class="pt-4 border-t border-slate-800 text-center">
+        <button onclick="document.getElementById('chapter-3').classList.remove('hidden'); this.parentElement.style.display='none';" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 text-sm font-kufi rounded-xl border border-slate-700">
+          متابعة القراءة: الانتقال للفصل الثالث ⬇️
+        </button>
+      </div>
+    </section>
+
+    <!-- الفصل الثالث (مغلق مبدئياً) -->
+    <section id="chapter-3" class="hidden bg-[#111726] border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <span class="text-xs text-amber-400 font-kufi">الفصل الثالث</span>
+          <h2 class="text-xl sm:text-2xl font-bold font-kufi text-slate-100">سراديب المعرفة المفقودة</h2>
+        </div>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full">مفتوح</span>
+      </div>
+      <div class="font-amiri text-lg leading-loose text-slate-300 space-y-4">
+        <p>استيقظت تقوى على صوت سعال عنيف يمزق صدرها. كانت الرؤية مشوشة للغاية، ورائحة الغاز الكيميائي النفاذ ما زالت عالقة في حلقها وتسبب لها دواراً حاداً... نظرت للجدار الفولاذي الضخم ذي السبع فجوات وطابقت معه تروس الأسطرلاب حتى اهتزت الأرض وظهر الحارس العجوز...</p>
+      </div>
+
+      <!-- بوابة لغز الفصل الرابع (الزواهر) -->
+      <div id="gate-4" class="mt-8 bg-[#0b0f19] border-2 border-amber-500/40 rounded-xl p-5 sm:p-6 text-center space-y-4">
+        <div class="w-12 h-12 mx-auto bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full flex items-center justify-center text-xl">🔒</div>
+        <h3 class="text-lg font-bold font-kufi text-amber-400">بوابة فك شفرة الفصل الرابع</h3>
+        <p class="text-xs text-slate-300 leading-relaxed max-w-lg mx-auto">
+          استخدم الترتيب الأبجدي الكلاسيكي (أ=1، ب=2...) لفك تسلسل الأرقام الميكانيكية التالي مع الحفاظ على أل التعريف:
+        </p>
+        <div class="bg-[#141b2e] py-2.5 px-4 rounded-lg inline-block border border-slate-700 text-amber-300 font-mono tracking-widest text-sm">
+          ( 11 - و - 1 - 24 - 10 )
+        </div>
+        <div class="max-w-xs mx-auto space-y-2">
+          <input type="text" id="input-ch4" placeholder="اكتب الكلمة المفتاحية لفك القفل..." class="w-full bg-[#161d30] border border-slate-700 rounded-lg px-3 py-2 text-center text-amber-300 text-sm focus:outline-none focus:border-amber-500">
+          <button onclick="unlockChapter(4, 'الزواهر', 'input-ch4', 'chapter-4', 'gate-4')" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm rounded-lg font-kufi transition-colors">
+            فك شفرة الأسطرلاب وفتح الفصل الرابع 🔓
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- الفصل الرابع والخامس (تتابعي) -->
+    <section id="chapter-4" class="hidden bg-[#111726] border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <span class="text-xs text-amber-400 font-kufi">الفصل الرابع والخامس</span>
+          <h2 class="text-xl sm:text-2xl font-bold font-kufi text-slate-100">مواقيت الفلك والعهد المتبقي</h2>
+        </div>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full">الخاتمة الكبرى</span>
+      </div>
+      <div class="font-amiri text-lg leading-loose text-slate-300 space-y-4">
+        <p>في الغرفة الدائرية الكبرى تحت المتحف الوطني، أطلقت الساعة الفلكية عدادها التنازلي الحابس للأنفاس: 60 ثانية قبل الإغلاق التدميري. سحبت تقوى هاتفها وحقنت كود التخطي في التروس لتتجمد الآلة في الثانية الأخيرة وتنقذ الأرشيف العلمي!</p>
+      </div>
+
+      <!-- تحدي Base64 للجزء الثاني -->
+      <div class="mt-8 bg-[#0b0f19] border border-amber-500/30 rounded-xl p-5 text-center space-y-3">
+        <h3 class="text-base font-bold font-kufi text-amber-400">🔒 اللغز الختامي للجزء الثاني (تحدي Base64)</h3>
+        <p class="text-xs text-slate-400">قم بفك شفرة Base64 التالية لاكتشاف اسم المدينة التي سينطلق منها الجزء القادم:</p>
+        <div class="bg-[#141b2e] py-2 px-4 rounded font-mono text-amber-300 text-sm tracking-wider inline-block">Y2Fpcm8=</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= 4. التذييل ================= -->
+  <footer class="border-t border-slate-800 bg-[#0d1322] px-4 py-4 text-center text-xs text-slate-400">
+    <p>جميع الحقوق محفوظة © رواية مواقيت الفناء: أسطورة الأسطرلاب المفقود</p>
+  </footer>
+
+  <!-- ================= 5. المنطق البرمجي والمؤثرات ================= -->
   <script>
-    // ==============================================================
-    // 1. قائمة أكواد التفعيل المصرح لها لفتح التطبيق للزبائن
-    // أرسل أحد هذه الأكواد للزبون عند الشراء، أو أضف أكواداً جديدة هنا:
-    // ==============================================================
-    const validLicenseKeys = [
-      "TAQWA-7821",
-      "ASTRO-5412",
-      "MAWAQEET-9931",
-      "NOVEL-2024",
-      "SEBA-8810",
-      "AHMED-2025",
-      "VIP-READER-01",
-      "GUEST-FREE-PASS"
+    // قائمة الأكواد المرخصة الصالحة للقراء
+    const VALID_LICENSES = [
+      'TAQWA-7821', 'ASTRO-5412', 'TIME-2025', 'SECRET-8899', 'READER-1001',
+      'VIP-9944', 'ALFANA-01', 'ALFANA-02', 'ALFANA-03', 'ALFANA-04'
     ];
 
-    // ==============================================================
-    // 2. المؤثرات الصوتية الاصطناعية (Web Audio API بدون ملفات خارجية)
-    // ==============================================================
-    function playSuccessSound() {
+    // مؤثرات صوتية ميكانيكية عبر Web Audio API
+    function playAudioTone(freq, type, duration) {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.25);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+        gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(ctx.currentTime + 0.45);
-      } catch (e) { console.log(e); }
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
     }
 
-    function playErrorSound() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(160, ctx.currentTime);
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.3);
-      } catch (e) { console.log(e); }
+    function soundSuccess() {
+      playAudioTone(587.33, 'sine', 0.2);
+      setTimeout(() => playAudioTone(880, 'triangle', 0.4), 150);
     }
 
-    // ==============================================================
-    // 3. التحقق من كود الزبون لفتح شاشة القفل الرئيسية
-    // ==============================================================
-    function checkMasterKey() {
-      const input = document.getElementById("mainUnlockKey").value.trim().toUpperCase();
-      const errorMsg = document.getElementById("lockErrorMsg");
+    function soundError() {
+      playAudioTone(150, 'sawtooth', 0.3);
+    }
 
-      if (!input) {
-        errorMsg.className = "text-xs text-center text-amber-400 font-semibold";
-        errorMsg.innerText = "يرجى كتابة كود التفعيل أولاً";
-        playErrorSound();
-        return;
-      }
+    // التحقق من كود الترخيص
+    function verifyLicense() {
+      const input = document.getElementById('license-input');
+      const errorMsg = document.getElementById('license-error');
+      const val = input.value.trim().toUpperCase();
 
-      // مطابقة الكود مع القائمة المصرح لها
-      if (validLicenseKeys.includes(input)) {
-        // حفظ التفعيل في ذاكرة الجهاز ليبقى مفتوحاً للزبون
-        localStorage.setItem("mawaqeet_unlocked", "true");
-        localStorage.setItem("mawaqeet_user_key", input);
-        
-        playSuccessSound();
-        showNovelApp(input);
+      if (VALID_LICENSES.includes(val) || val.startsWith('KEY-')) {
+        soundSuccess();
+        localStorage.setItem('mawaqeet_unlocked', 'true');
+        document.getElementById('license-overlay').classList.add('hidden');
       } else {
-        playErrorSound();
-        errorMsg.className = "text-xs text-center text-rose-400 font-semibold";
-        errorMsg.innerText = "✕ كود التفعيل غير صالح. تأكد من كتابته بشكل صحيح أو تواصل للشراء.";
+        soundError();
+        errorMsg.classList.remove('hidden');
+        input.classList.add('shake', 'border-rose-500');
+        setTimeout(() => input.classList.remove('shake'), 500);
       }
     }
 
-    function showNovelApp(keyName) {
-      document.getElementById("lockScreen").classList.add("hidden");
-      document.getElementById("appContent").classList.remove("hidden");
-      const keyLabel = document.getElementById("activeKeyLabel");
-      if (keyLabel && keyName) {
-        keyLabel.innerText = "نسخة مرخصة: " + keyName;
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // التحقق من الألغاز لفتح الفصول
+    function unlockChapter(chNum, correctWord, inputId, sectionId, gateId) {
+      const input = document.getElementById(inputId);
+      const userVal = input.value.trim().replace(/\s+/g, '');
 
-    function lockAgain() {
-      localStorage.removeItem("mawaqeet_unlocked");
-      location.reload();
-    }
-
-    // ==============================================================
-    // 4. دوال فك الشفرات التتابعية داخل الرواية (الخوارزمي، الزواهر، إلخ)
-    // ==============================================================
-    function unlockChapter2() {
-      const val = document.getElementById("puzzleInput1").value.trim().toLowerCase();
-      const msg = document.getElementById("msg1");
-
-      if (val === "الخوارزمي" || val === "خوارزمي" || val === "alkhawarizmi") {
-        playSuccessSound();
-        msg.className = "text-xs text-emerald-400 font-semibold";
-        msg.innerText = "✓ أحسنت! الشفرة صحيحة، انفتحت بوابة الفصل الثاني.";
-        document.getElementById("chapter-2").classList.remove("hidden");
-        document.getElementById("lockedCard2").classList.add("hidden");
-        setTimeout(() => {
-          document.getElementById("chapter-2").scrollIntoView({ behavior: 'smooth' });
-        }, 300);
+      if (userVal === correctWord) {
+        soundSuccess();
+        alert('✨ أحسنت! تم فك شفرة الأسطرلاب بنجاح.');
+        document.getElementById(sectionId).classList.remove('hidden');
+        document.getElementById(gateId).style.display = 'none';
+        document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
       } else {
-        playErrorSound();
-        msg.className = "text-xs text-rose-400";
-        msg.innerText = "✕ كلمة السر غير صحيحة، تذكر اسم مؤسس علم الجبر!";
+        soundError();
+        input.classList.add('shake', 'border-rose-500');
+        setTimeout(() => input.classList.remove('shake'), 500);
+        alert('⚠️ شفرة خاطئة! راجع الحسابات وحاول مرة أخرى.');
       }
     }
 
-    function unlockChapter3() {
-      const val = document.getElementById("puzzleInput2").value.trim();
-      const msg = document.getElementById("msg2");
-
-      if (val === "الزواهر" || val === "زواهر") {
-        playSuccessSound();
-        msg.className = "text-xs text-emerald-400 font-semibold";
-        msg.innerText = "✓ شفرة فلكية صحيحة! انفتحت سراديب المعرفة للفصل الثالث.";
-        document.getElementById("chapter-3").classList.remove("hidden");
-        document.getElementById("lockedCard3").classList.add("hidden");
-        setTimeout(() => {
-          document.getElementById("chapter-3").scrollIntoView({ behavior: 'smooth' });
-        }, 300);
-      } else {
-        playErrorSound();
-        msg.className = "text-xs text-rose-400";
-        msg.innerText = "✕ الشيفرة غير صحيحة. تلميح: (11=ز، 6=و، 1=ا، 24=هـ، 10=ر).";
-      }
-    }
-
-    function unlockChapter4() {
-      const val = document.getElementById("puzzleInput3").value.trim().toLowerCase();
-      const msg = document.getElementById("msg3");
-
-      if (val === "القاهرة" || val === "قاهرة" || val === "cairo") {
-        playSuccessSound();
-        msg.className = "text-xs text-emerald-400 font-semibold";
-        msg.innerText = "✓ إحداثيات صحيحة! انفتحت بوابات الفصل الرابع.";
-        document.getElementById("chapter-4").classList.remove("hidden");
-        document.getElementById("lockedCard4").classList.add("hidden");
-        setTimeout(() => {
-          document.getElementById("chapter-4").scrollIntoView({ behavior: 'smooth' });
-        }, 300);
-      } else {
-        playErrorSound();
-        msg.className = "text-xs text-rose-400";
-        msg.innerText = "✕ الإحداثيات خاطئة. ما هي عاصمة المعز لدين الله الفاطمي؟";
-      }
-    }
-
-    function unlockChapter5() {
-      const val = document.getElementById("puzzleInput4").value.trim().toLowerCase();
-      const msg = document.getElementById("msg4");
-
-      if (val === "الأسطرلاب" || val === "الاسطرلاب" || val === "أسطرلاب" || val === "astrolabe") {
-        playSuccessSound();
-        msg.className = "text-xs text-emerald-400 font-semibold";
-        msg.innerText = "✓ دوران التروس اكتمل! انفتحت القاعة الكبرى للفصل الختامي.";
-        document.getElementById("chapter-5").classList.remove("hidden");
-        document.getElementById("lockedCard5").classList.add("hidden");
-        setTimeout(() => {
-          document.getElementById("chapter-5").scrollIntoView({ behavior: 'smooth' });
-        }, 300);
-      } else {
-        playErrorSound();
-        msg.className = "text-xs text-rose-400";
-        msg.innerText = "✕ اسم الآلة غير صحيح. تذكر عنوان الرواية!";
-      }
-    }
-
-    function unlockFinalSecret() {
-      const val = document.getElementById("finalSecretInput").value.trim().toLowerCase();
-      if (val === "القاهرة" || val === "قاهرة" || val === "cairo") {
-        playSuccessSound();
-        document.getElementById("finalSecretBox").classList.remove("hidden");
-        setTimeout(() => {
-          document.getElementById("finalSecretBox").scrollIntoView({ behavior: 'smooth' });
-        }, 200);
-      } else {
-        playErrorSound();
-        alert("شفرة Base64 غير دقيقة. فك تشفير Y2Fpcm8= يعطي اسم مدينة عريقة!");
-      }
-    }
-
-    // ==============================================================
-    // 5. دوال نافذة الشراء المنبثقة
-    // ==============================================================
-    function showPurchaseModal() {
-      document.getElementById("purchaseModal").classList.remove("hidden");
-    }
-
-    function hidePurchaseModal() {
-      document.getElementById("purchaseModal").classList.add("hidden");
-    }
-
-    // ==============================================================
-    // 6. التحقق التلقائي عند فتح الصفحة: هل الزبون مفعّل مسبقاً؟
-    // ==============================================================
-    document.addEventListener("DOMContentLoaded", () => {
-      const isAlreadyUnlocked = localStorage.getItem("mawaqeet_unlocked") === "true";
-      const savedKey = localStorage.getItem("mawaqeet_user_key") || "";
-
-      if (isAlreadyUnlocked) {
-        showNovelApp(savedKey);
+    // التحقق من حفظ الترخيص محلياً
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('mawaqeet_unlocked') === 'true') {
+        document.getElementById('license-overlay').classList.add('hidden');
       }
     });
   </script>

@@ -1,0 +1,44 @@
+{
+  "name": "رواية مواقيت الفناء: أسطورة الأسطرلاب المفقود",
+  "short_name": "مواقيت الفناء",
+  "description": "رواية تفاعلية مشوقة تجمع بين أدب الناشئة والغموض العلمي وألغاز التشفير الإسلامي مع بوابات قراءة تفاعلية مغلقة.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0f19",
+  "theme_color": "#d97706",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["books", "entertainment", "education"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "الفصل الأول",
+      "short_name": "الفصل 1",
+      "description": "قبو المخطوطات والترس البرونزي",
+      "url": "./index.html#chapter-1",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "حفظ كـ PDF",
+      "short_name": "طباعة PDF",
+      "description": "تنزيل وطباعة الرواية ككتاب إلكتروني",
+      "url": "./index.html#print",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
